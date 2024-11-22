@@ -33,6 +33,12 @@ Route::post("/books/{book}/borrow/{student}", [BorrowController::class , "store"
 Route::post("/borrows/{borrow}", [BorrowReturnController::class , "store"])->middleware(['auth', 'verified'])->name('borrow_returns.store');
 
 
+Route::resource("ayams", BookController::class)->middleware(['auth', 'verified']);
+
+// Route::get('/ayams', [BookController::class, "index"]);
+// Route::post('/ayams', [BookController::class, "store"]);
+// Route::put('/ayams/{ayam}', [BookController::class, "update"]);
+
 Route::resource("books", BookController::class)->middleware(['auth', 'verified']);
 Route::resource("authors", AuthorController::class)->middleware(['auth', 'verified']);
 Route::resource("publishers", PublisherController::class)->middleware(['auth', 'verified']);

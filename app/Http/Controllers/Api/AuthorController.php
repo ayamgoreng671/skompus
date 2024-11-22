@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\Author;
 use Illuminate\Http\Request;
 
@@ -12,9 +13,9 @@ class AuthorController extends Controller
      */
     public function index()
     {
-        return view("authors.index", [
-            "authors" => Author::latest()->get()
-        ]);
+        $authors = Author::latest()->get();
+        
+        return response()->json([["message" => "Data Listed Successfully !"],$authors]);
     }
 
     /**
@@ -22,7 +23,7 @@ class AuthorController extends Controller
      */
     public function create()
     {
-        
+        //
     }
 
     /**
@@ -30,24 +31,20 @@ class AuthorController extends Controller
      */
     public function store(Request $request)
     {
-        // $this->validate($request, [
-        //     "name" => ["required"],
-        //     "photo" => ["required"]
-        // ]);
-
         $request->validate([
             "name" => ["required"],
             "photo" => ["required"]
         ]);
 
-        Author::create([
+        $newData = Author::create([
             "name" => $request->name,
             "photo" =>  $request->file("photo")->store("authors", "public")
         ]);
 
-        session()->flash('success', 'Berhasil menambahkan author');
+       
+        return response()->json([["message" => "Data Added Successfully !"],$newData]);
 
-        return to_route('authors.index');
+        // return response('authors.index')->json([]"Data berhasil ditambahkan !")->json($newData);
     }
 
     /**
@@ -55,7 +52,10 @@ class AuthorController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $author = Author::find($id);
+
+        return response()->json([["message" => "Data Finded Successfully !"],$author]);
+
     }
 
     /**
@@ -63,9 +63,7 @@ class AuthorController extends Controller
      */
     public function edit(string $id)
     {
-        return view("authors.edit", [
-            "author" => Author::find($id)
-        ]);
+        //
     }
 
     /**
@@ -73,26 +71,34 @@ class AuthorController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        // $this->validate($request, [
-        //     "name" => ["required"],
-        //     "photo" => ["required"]
-        // ]);
-        
         $request->validate([
             "name" => ["required"],
             // "photo" => ["required"]
         ]);
 
+        // dd($request);
+
         $author = Author::find($id);
 
-        $author->update([
-            "name" => $request->name,
-            "photo" =>  $request->file("photo")->store("authors", "public")
-        ]);
+        if(isset($request->photo)){
+            $updatedData = $author->update([
+                "name" => $request->name,
+                "photo" =>  $request->file("photo")->store("authors", "public")
+            ]);
 
-        session()->flash('success', 'Berhasil memperbarui author');
+            $updatedData = Author::find($id);
 
-        return to_route('authors.index');
+        }else{
+            $updatedData = $author->update([
+                "name" => $request->name
+            ]);
+            $updatedData = Author::find($id);
+        }
+
+
+
+        return response()->json([["message" => "Data Updated Successfully !"],$updatedData]);
+
     }
 
     /**
@@ -104,8 +110,7 @@ class AuthorController extends Controller
 
         $author->delete();
 
-        session()->flash('danger', 'Berhasil menghapus author');
+        return response()->json(["message" => "Data Deleted Successfully !"]);
 
-        return to_route('authors.index');
     }
 }

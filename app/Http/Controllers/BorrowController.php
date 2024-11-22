@@ -19,7 +19,7 @@ class BorrowController extends Controller
         
         // dd(BorrowReturn::where("borrow_id", 1)->exists());
         return view("borrows.index", [
-            "borrows" => Borrow::all(),
+            "borrows" => Borrow::orderBy("id", "DESC")->get(),
             "borrow_returns" => BorrowReturn::all()
         ]);
     }
